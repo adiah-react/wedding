@@ -1,3 +1,5 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
@@ -75,7 +77,64 @@ const Navigation = () => {
         >
           Rhiannon & Rashaad
         </Link>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-8">
+          {allLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`relative text-smm uppercase tracking-widest font-medium transition-colors duration-300 group ${textColorClass}`}
+            >
+              {link.name}
+              <span
+                className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${
+                  scrolled || !isDarkBg ? "bg-wedding-black" : "bg-white"
+                }`}
+              ></span>
+            </Link>
+          ))}
+
+          {/* TODO - Auth Status / Login Link */}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`md:hidden p-2 focus:outline-none transition-colors duration-300 ${textColorClass}`}
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "100vh" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 bg-wedding-black z-40 flex flex-col items-center justify-center md:hidden"
+          >
+            <div className="flex flex-col space-y-8 text-center">
+              {allLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className="text-white font-serif text-4xl hover:text-wedding-gold transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+
+              <div className="w-12 h-px bg-white/20 mx-auto my-4"></div>
+
+              {/* TODO - Auth Status / Login Link */}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
