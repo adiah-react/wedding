@@ -6,6 +6,7 @@ import {
   useLocation,
 } from "react-router";
 import Footer from "./components/layout/Footer";
+import Navigation from "./components/layout/Navigation";
 import MusicToggle from "./components/ui/MusicToggle";
 import EventDetails from "./pages/EventDetails";
 import LandingPage from "./pages/LandingPage";
@@ -16,7 +17,7 @@ const AppContent = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navigation */}
+      <Navigation />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
