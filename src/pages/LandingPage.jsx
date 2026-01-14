@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { Link } from "react-router";
+import Button from "../components/ui/Button";
 import CountdownTimer from "../components/ui/CountdownTimer";
 import PageTransition from "../components/ui/PageTransition";
 const LandingPage = () => {
@@ -57,14 +59,14 @@ const LandingPage = () => {
             </motion.div>
 
             <div className="pt-8">
-              {/* <Link to="/details">
+              <Link to="/details">
                 <Button
                   variant="outline"
                   className="border-white text-white hover:bg-white hover:text-black"
                 >
                   Event Details
                 </Button>
-              </Link> */}
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -98,9 +100,9 @@ const LandingPage = () => {
               joy.
             </p>
             <div className="mt-10">
-              {/* <Link to="/story">
+              <Link to="/story">
                 <Button variant="secondary">Read Our Story</Button>
-              </Link> */}
+              </Link>
             </div>
           </motion.div>
         </div>

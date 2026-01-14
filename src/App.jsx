@@ -7,7 +7,9 @@ import {
 } from "react-router";
 import Footer from "./components/layout/Footer";
 import MusicToggle from "./components/ui/MusicToggle";
+import EventDetails from "./pages/EventDetails";
 import LandingPage from "./pages/LandingPage";
+import OurStory from "./pages/OurStory";
 
 const AppContent = () => {
   const location = useLocation();
@@ -20,6 +22,8 @@ const AppContent = () => {
           <Routes location={location} key={location.pathname}>
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/story" element={<OurStory />} />
+            <Route path="/details" element={<EventDetails />} />
           </Routes>
         </AnimatePresence>
       </main>
