@@ -12,7 +12,7 @@ const Button = ({
   const variants = {
     primary:
       "bg-wedding-gold text-white hover:bg-[#b08d43] focus:ring-wedding-gold",
-    seondary:
+    secondary:
       "bg-wedding-black text-white hover:bg-gray-900 focus:ring-wedding-black",
     outline:
       "border border-wedding-black text-wedding-black hover:bg-wedding-black hover:text-white focus:ring-wedding-black bg-transparent",
