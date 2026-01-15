@@ -1,15 +1,16 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
+import { useInvitation } from "../../hooks/useInvitation";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-
-  // TODO - auth and admin check
+  const { isAuthenticated, invitation, logout } = useInvitation();
+  // TODO - admin check
 
   // Determine theme based on route
   // Landing page and Welcome page are black bg (needs white text)
@@ -29,11 +30,10 @@ const Navigation = () => {
     setIsOpen(false);
   }, [location]);
 
-  // TODO - logout
-  // const handleLogout = () => {
-  // 	logOut()
-  // 	navigate('/')
-  // }
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   const textColorClass = scrolled
     ? "text-wedding-black"
@@ -61,7 +61,7 @@ const Navigation = () => {
   ];
 
   // TODO - add protected links if authenticated
-  const protectedLinks = [];
+  const protectedLinks = isAuthenticated ? [] : [];
 
   const allLinks = [...navLinks, ...protectedLinks];
 
@@ -84,7 +84,7 @@ const Navigation = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`relative text-smm uppercase tracking-widest font-medium transition-colors duration-300 group ${textColorClass}`}
+              className={`relative text-sm uppercase tracking-widest font-medium transition-colors duration-300 group ${textColorClass}`}
             >
               {link.name}
               <span
@@ -95,7 +95,50 @@ const Navigation = () => {
             </Link>
           ))}
 
-          {/* TODO - Auth Status / Login Link */}
+          {/* Auth Status / Login Link */}
+          <div
+            className={`h-4 w-px ${
+              scrolled || isDarkBg ? "bg-gray-300" : "bg-white/30"
+            }`}
+          ></div>
+
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-4">
+              <Link
+                to={"/welcome"}
+                className={`flex items-center text-sm font-medium ${textColorClass} hover:opacity-70 transition-opacity`}
+              >
+                <User size={16} className="mr-2" />
+                <span className="uppercase tracking-wide hidden lg:inline">
+                  {invitation?.groupName}
+                </span>
+                <span className="uppercase tracking-wide lg:hidden">
+                  Guests
+                </span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className={`p-1 rounded-full hover:bg-black/5 transition-colors ${textColorClass}`}
+                title="Logout"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/invite"
+                className={`text-sm uppercase tracking-widest font-medium border px-4 py-2 transition-all duration-300 ${
+                  scrolled || isDarkBg
+                    ? "border-wedding-black text-wedding-black hover:bg-wedding-black hover:text-white"
+                    : "border-white text-white hover:bg-white hover:text-black"
+                }`}
+              >
+                Guest Access
+              </Link>
+              {/* TODO - check for admin status */}
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -130,7 +173,32 @@ const Navigation = () => {
 
               <div className="w-12 h-px bg-white/20 mx-auto my-4"></div>
 
-              {/* TODO - Auth Status / Login Link */}
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/welcome"
+                    className="text-white font-serif text-2xl hover:text-wedding-gold transition-colors"
+                  >
+                    Your Invitation
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-gray-400 text-sm uppercase tracking-widest mt-4"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <div className="flex flex-col space-y-4">
+                  <Link
+                    to="/invite"
+                    className="text-wedding-gold font-serif text-2xl hover:text-white transition-colors"
+                  >
+                    Guest Access
+                  </Link>
+                  {/* TODO - Admin login */}
+                </div>
+              )}
             </div>
           </motion.div>
         )}
