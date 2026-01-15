@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { Lock } from "lucide-react";
 import { useInvitation } from "../../hooks/useInvitation";
+import Button from "../ui/Button";
 
 const InvitationForm = ({ initialCode = "", onSuccess }) => {
   const [code, setCode] = useState(initialCode);
@@ -54,6 +55,17 @@ const InvitationForm = ({ initialCode = "", onSuccess }) => {
             {error}
           </motion.p>
         )}
+
+        <Button
+          type="submit"
+          disabled={isLoading || !code.trim()}
+          className="w-full justify-between group"
+        >
+          {isLoading ? "Unlocking..." : "Unlock Invitation"}
+          {!isLoading && (
+            <ArrowRight className="w-4 h-2 ml-2 transition-transform group-hover:translate-x-1" />
+          )}
+        </Button>
 
         {/* <Button
           type="submit"
