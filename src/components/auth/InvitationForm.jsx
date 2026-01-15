@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import Button from "../ui/button";
 
-import { ArrowRight, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useInvitation } from "../../hooks/useInvitation";
 
 const InvitationForm = ({ initialCode = "", onSuccess }) => {
@@ -56,7 +55,7 @@ const InvitationForm = ({ initialCode = "", onSuccess }) => {
           </motion.p>
         )}
 
-        <Button
+        {/* <Button
           type="submit"
           disabled={isLoading || !code.trim()}
           className="w-full justify-between group"
@@ -65,7 +64,7 @@ const InvitationForm = ({ initialCode = "", onSuccess }) => {
           {!isLoading && (
             <ArrowRight className="w-4 h-2 ml-2 transition-transform group-hover:translate-x-1" />
           )}
-        </Button>
+        </Button> */}
       </form>
 
       <p className="mt-8 text-center text-xs text-gray-400 uppercase tracking-widest">
