@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Calendar, CheckCircle, MapPin, Users } from "lucide-react";
+import { Link } from "react-router";
+import Button from "../components/ui/Button";
 import PageTransition from "../components/ui/PageTransition";
 import { useInvitation } from "../hooks/useInvitation";
 
@@ -113,7 +115,7 @@ const WelcomePage = () => {
           }}
           className="flex flex-col md:flex-row items-center justify-center gap-6"
         >
-          {/* <Link to="/details">
+          <Link to="/details">
             <Button
               variant="primary"
               size="lg"
@@ -130,7 +132,7 @@ const WelcomePage = () => {
             >
               Read Our Story
             </Button>
-          </Link> */}
+          </Link>
         </motion.div>
       </div>
     </PageTransition>

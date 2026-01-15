@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 
-import { Lock } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 import { useInvitation } from "../../hooks/useInvitation";
 import Button from "../ui/Button";
 
