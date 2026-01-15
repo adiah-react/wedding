@@ -22,7 +22,7 @@ const LandingPage = () => {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="text-wedding-grey text-lg md:text-xl italic font-serif tracking-wide"
           >
-            &quot;Twho souls, one heart&quot;
+            &quot;Two souls, one heart&quot;
           </motion.p>
 
           <motion.h1
