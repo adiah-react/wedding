@@ -66,17 +66,6 @@ const InvitationForm = ({ initialCode = "", onSuccess }) => {
             <ArrowRight className="w-4 h-2 ml-2 transition-transform group-hover:translate-x-1" />
           )}
         </Button>
-
-        {/* <Button
-          type="submit"
-          disabled={isLoading || !code.trim()}
-          className="w-full justify-between group"
-        >
-          {isLoading ? "Unlocking..." : "Unlock Invitation"}
-          {!isLoading && (
-            <ArrowRight className="w-4 h-2 ml-2 transition-transform group-hover:translate-x-1" />
-          )}
-        </Button> */}
       </form>
 
       <p className="mt-8 text-center text-xs text-gray-400 uppercase tracking-widest">

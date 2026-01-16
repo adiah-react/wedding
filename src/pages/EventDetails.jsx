@@ -1,10 +1,13 @@
 import { Clock, Info, Lock, MapPin } from "lucide-react";
+import { Link } from "react-router";
 import Button from "../components/ui/Button";
 import PageTransition from "../components/ui/PageTransition";
 import ScrollReveal from "../components/ui/ScrollReveal";
+import { useInvitation } from "../hooks/useInvitation";
 
 const EventDetails = () => {
   // TODO: check authentication status
+  const { isAuthenticated, hasFullAccess } = useInvitation();
   return (
     <PageTransition className="bg-white txt-wedding-black pt-24 pb-24">
       <div className="max-w-6xl mx-auto px-6">
@@ -64,22 +67,50 @@ const EventDetails = () => {
                 6:00 PM - Midnight
               </p>
 
-              {/* TODO - Check for authentication */}
-              <div className="bg-gray-50 p-8 rounded-sm border border-gray-100 flex flex-col items-center">
-                <Lock className="w-6 h-6 text-gray-400 mb-3" />
-                <p className="text-gray-900 font-medium mb-2">
-                  Private Event Details
-                </p>
-                <p className="text-sm text-gray-500 mb-4">
-                  Please enter your invitation code to view reception details.
-                </p>
-                {/* TODO - link to invite page */}
-                {/* <Link to="/invite"> */}
-                <Button variant="outline" size="sm">
-                  Unlock Access
-                </Button>
-                {/* </Link> */}
-              </div>
+              {isAuthenticated ? (
+                hasFullAccess ? (
+                  <div className="space-y-4 text-gray-600 font-light text-lg">
+                    <p className="font-medium text-black">The Bowery Hotel</p>
+                    <p>355 Bowery</p>
+                    <p>New York, NY 10003</p>
+                    <div className="pt-4">
+                      <a
+                        href="#"
+                        className="inline-flex items-center text-sm font-medium text-wedding-black hover:text-wedding-gold transition-colors border-b border-black hover:border-wedding-gold pb-0 5"
+                      >
+                        <MapPin className="w-4 h-4 mr-2" />
+                        View Map
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 p-8 rounded-sm border border-gray-100 text-center">
+                    <p className="text-gray-500 italic mb-2">
+                      Ceremony Only Invitation
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      This portion of the event is reserved for reception
+                      guests.
+                    </p>
+                  </div>
+                )
+              ) : (
+                <div className="bg-gray-50 p-8 rounded-sm border border-gray-100 flex flex-col items-center">
+                  <Lock className="w-6 h-6 text-gray-400 mb-3" />
+                  <p className="text-gray-900 font-medium mb-2">
+                    Private Event Details
+                  </p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Please enter your invitation code to view reception details.
+                  </p>
+                  {/* TODO - link to invite page */}
+                  <Link to="/invite">
+                    <Button variant="outline" size="sm">
+                      Unlock Access
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </ScrollReveal>
           </div>
         </div>
