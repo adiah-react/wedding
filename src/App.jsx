@@ -11,6 +11,8 @@ import Navigation from "./components/layout/Navigation";
 import MusicToggle from "./components/ui/MusicToggle";
 import { GuestProvider } from "./contexts/GuestContext";
 import EventDetails from "./pages/EventDetails";
+import GuestbookPage from "./pages/GuestbookPage";
+import HoneymoonFundPage from "./pages/HoneymoonFundPage";
 import InvitationAccess from "./pages/InvitationAccess";
 import LandingPage from "./pages/LandingPage";
 import OurStory from "./pages/OurStory";
@@ -50,6 +52,23 @@ const AppContent = () => {
               element={
                 <ProtectedRoute>
                   <RSVPPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/guestbook"
+              element={
+                <ProtectedRoute>
+                  <GuestbookPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/honeymoon"
+              element={
+                <ProtectedRoute>
+                  <HoneymoonFundPage />
                 </ProtectedRoute>
               }
             />
