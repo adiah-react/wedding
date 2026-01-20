@@ -38,8 +38,8 @@ const Navigation = () => {
   const textColorClass = scrolled
     ? "text-wedding-black"
     : isDarkBg
-    ? "text-white"
-    : "text-wedding-black";
+      ? "text-white"
+      : "text-wedding-black";
 
   const bgClass = scrolled
     ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
@@ -61,7 +61,22 @@ const Navigation = () => {
   ];
 
   // TODO - add protected links if authenticated
-  const protectedLinks = isAuthenticated ? [] : [];
+  const protectedLinks = isAuthenticated
+    ? [
+        {
+          name: "RSVP",
+          path: "/rsvp",
+        },
+        {
+          name: "Guestbook",
+          path: "/guestbook",
+        },
+        {
+          name: "Honeymoon",
+          path: "/honeymoon",
+        },
+      ]
+    : [];
 
   const allLinks = [...navLinks, ...protectedLinks];
 

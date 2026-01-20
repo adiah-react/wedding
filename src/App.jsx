@@ -14,6 +14,7 @@ import EventDetails from "./pages/EventDetails";
 import InvitationAccess from "./pages/InvitationAccess";
 import LandingPage from "./pages/LandingPage";
 import OurStory from "./pages/OurStory";
+import RSVPPage from "./pages/RSVPPage";
 import WelcomePage from "./pages/WelcomePage";
 
 const AppContent = () => {
@@ -41,6 +42,14 @@ const AppContent = () => {
               element={
                 <ProtectedRoute>
                   <WelcomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rsvp"
+              element={
+                <ProtectedRoute>
+                  <RSVPPage />
                 </ProtectedRoute>
               }
             />
