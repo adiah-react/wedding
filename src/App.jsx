@@ -5,11 +5,18 @@ import {
   Routes,
   useLocation,
 } from "react-router";
+import AdminRoute from "./components/admin/AdminRoute";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Footer from "./components/layout/Footer";
 import Navigation from "./components/layout/Navigation";
 import MusicToggle from "./components/ui/MusicToggle";
+import { AdminProvider } from "./contexts/AdminContext";
 import { GuestProvider } from "./contexts/GuestContext";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLogin from "./pages/admin/AdminLogin";
+import ContributionTracking from "./pages/admin/ContributionTracking";
+import GuestManagement from "./pages/admin/GuestManagement";
+import RSVPSummary from "./pages/admin/RSVPSummary";
 import EventDetails from "./pages/EventDetails";
 import GuestbookPage from "./pages/GuestbookPage";
 import HoneymoonFundPage from "./pages/HoneymoonFundPage";
@@ -72,23 +79,64 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
+
+            {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/guests"
+              element={
+                <AdminRoute>
+                  <GuestManagement />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/rsvps"
+              element={
+                <AdminRoute>
+                  <RSVPSummary />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/contributions"
+              element={
+                <AdminRoute>
+                  <ContributionTracking />
+                </AdminRoute>
+              }
+            />
           </Routes>
         </AnimatePresence>
       </main>
       {/* TODO: Remember only for non-admin routes */}
-      <Footer />
-      <MusicToggle />
+      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <MusicToggle />}
     </div>
   );
 };
 
 const App = () => {
   return (
-    <GuestProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </GuestProvider>
+    <AdminProvider>
+      <GuestProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </GuestProvider>
+    </AdminProvider>
   );
 };
 

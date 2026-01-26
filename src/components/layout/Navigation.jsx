@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Menu, User, X } from "lucide-react";
+import { LogOut, Menu, Shield, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
+import { useAdmin } from "../../contexts/AdminContext";
 import { useInvitation } from "../../hooks/useInvitation";
 
 const Navigation = () => {
@@ -10,7 +11,7 @@ const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, invitation, logout } = useInvitation();
-  // TODO - admin check
+  const { isAdminAuthenticated } = useAdmin();
 
   // Determine theme based on route
   // Landing page and Welcome page are black bg (needs white text)
@@ -113,7 +114,7 @@ const Navigation = () => {
           {/* Auth Status / Login Link */}
           <div
             className={`h-4 w-px ${
-              scrolled || isDarkBg ? "bg-gray-300" : "bg-white/30"
+              scrolled || !isDarkBg ? "bg-gray-300" : "bg-white/30"
             }`}
           ></div>
 
@@ -144,14 +145,22 @@ const Navigation = () => {
               <Link
                 to="/invite"
                 className={`text-sm uppercase tracking-widest font-medium border px-4 py-2 transition-all duration-300 ${
-                  scrolled || isDarkBg
+                  scrolled || !isDarkBg
                     ? "border-wedding-black text-wedding-black hover:bg-wedding-black hover:text-white"
                     : "border-white text-white hover:bg-white hover:text-black"
                 }`}
               >
                 Guest Access
               </Link>
-              {/* TODO - check for admin status */}
+              {isAdminAuthenticated && (
+                <Link
+                  to="/admin"
+                  className={`p-2 rounded-full hover:bg-black/5 transition-colors ${textColorClass}`}
+                  title="Admin Dashboard"
+                >
+                  <Shield size={18} />
+                </Link>
+              )}
             </div>
           )}
         </div>
@@ -160,6 +169,7 @@ const Navigation = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`md:hidden p-2 focus:outline-none transition-colors duration-300 ${textColorClass}`}
+          aria-label="Toggle Menu"
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -211,7 +221,12 @@ const Navigation = () => {
                   >
                     Guest Access
                   </Link>
-                  {/* TODO - Admin login */}
+                  <Link
+                    to="/admin/login"
+                    className="text-gray-500 text-sm uppercase tracking-widest hover:text-white transition-colors"
+                  >
+                    Admin Login
+                  </Link>
                 </div>
               )}
             </div>
