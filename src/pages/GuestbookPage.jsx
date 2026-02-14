@@ -1,23 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MessageCard from "../components/guestbook/MessageCard";
 import MessageForm from "../components/guestbook/MessageForm";
 import PageTransition from "../components/ui/PageTransition";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import { useInvitation } from "../hooks/useInvitation";
-import { MOCK_MESSAGES } from "../utils/mockGuestbook";
+import {
+  addGuestbookMessage,
+  subscribeToGuestbook,
+} from "../lib/firebaseService";
 
 const GuestbookPage = () => {
   const { isAuthenticated, invitation } = useInvitation();
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
-  const handleNewMessage = (text) => {
-    const newMessage = {
-      id: Date.now().toString(),
-      guestName: invitation?.groupName || "Guest",
-      message: text,
-      createdAt: new Date().toISOString(),
-    };
-    setMessages((prev) => [newMessage, ...prev]);
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Subscribe to real-time guestbook updates
+  useEffect(() => {
+    const unsubscribe = subscribeToGuestbook((updatedMessages) => {
+      setMessages(updatedMessages);
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleNewMessage = async (text) => {
+    const guestName = invitation?.groupName || "Guest";
+    await addGuestbookMessage(guestName, text);
+    // No need to manually update state - real-time listener will handle it
   };
+
   return (
     <PageTransition className="bg-white min-h-screen pt-24 pb-24">
       <div className="max-w-3xl mx-auto px-6">
@@ -32,11 +43,25 @@ const GuestbookPage = () => {
 
         {!isAuthenticated && <MessageForm onSubmit={handleNewMessage} />}
 
-        <div className="space-y-2">
-          {messages.map((msg, index) => (
-            <MessageCard key={msg.id} message={msg} index={index} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {messages.map((msg, index) => (
+              <MessageCard key={msg.id} message={msg} index={index} />
+            ))}
+            {messages.length === 0 && (
+              <p className="text-center text-gray-400 py-12">
+                No messages yet. Be the first to leave a note!
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </PageTransition>
   );

@@ -1,16 +1,31 @@
 import { LinkIcon, Plus, Search, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import GuestForm from "../../components/admin/GuestForm";
 import InvitationLinkModal from "../../components/admin/InvitationLinkModal";
 import Button from "../../components/ui/Button";
-import { MOCK_INVITATIONS } from "../../utils/mockInvitations";
+import {
+  createInvitation,
+  deleteInvitation as firebaseDeleteInvitation,
+  getAllInvitations,
+} from "../../lib/firebaseService";
 
 const GuestManagement = () => {
-  const [invitations, setInvitations] = useState(MOCK_INVITATIONS);
+  const [invitations, setInvitations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [newInvite, setNewInvite] = useState(null);
+
+  // Fetch invitations from Firebase
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      const data = await getAllInvitations();
+      setInvitations(data);
+      setIsLoading(false);
+    };
+    fetchInvitations();
+  }, []);
 
   const filteredInvitations = invitations.filter(
     (inv) =>
@@ -18,7 +33,7 @@ const GuestManagement = () => {
       inv.code.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const handleAddGuest = (data) => {
+  const handleAddGuest = async (data) => {
     const newInvitation = {
       code: data.code,
       groupName: data.groupName,
@@ -32,16 +47,22 @@ const GuestManagement = () => {
         })),
     };
 
-    setInvitations([...invitations, newInvitation]);
-    setNewInvite({
-      code: newInvitation.code,
-      groupName: newInvitation.groupName,
-    });
+    const success = await createInvitation(newInvitation);
+    if (success) {
+      setInvitations([...invitations, newInvitation]);
+      setNewInvite({
+        code: newInvitation.code,
+        groupName: newInvitation.groupName,
+      });
+    }
   };
 
-  const handleDelete = (code) => {
+  const handleDelete = async (code) => {
     if (confirm("Are you sure you want to delete this invitation?")) {
-      setInvitations(invitations.filter((inv) => inv.code !== code));
+      const success = await firebaseDeleteInvitation(code);
+      if (success) {
+        setInvitations(invitations.filter((inv) => inv.code !== code));
+      }
     }
   };
 
@@ -71,77 +92,83 @@ const GuestManagement = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
-              <tr>
-                <th className="px-6 py-4 font-medium">Group Name</th>
-                <th className="px-6 py-4 font-medium">Code</th>
-                <th className="px-6 py-4 font-medium">Guests</th>
-                <th className="px-6 py-4 font-medium">Access</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredInvitations.map((inv) => (
-                <tr
-                  key={inv.code}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {inv.groupName}
-                  </td>
-                  <td className="px-6 py-4 font-mono-text-sm text-gray-600">
-                    {inv.code}
-                  </td>
-                  <td className="px-6 py-4 text-gray-600">
-                    {inv.guests.length}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${inv.accessLevel === "full" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}
-                    >
-                      {inv.accessLevel === "full"
-                        ? "Full wedding"
-                        : "Ceremony Only"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    {inv.guests.some((g) => g.rsvpStatus !== "pending") ? (
-                      <span className="text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
-                        Responded
-                      </span>
-                    ) : (
-                      <span className="text-gray-500 text-xs font-medium bg-gray-100 px-2 py-1 rounded-full">
-                        Pending
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <button
-                      onClick={() =>
-                        setNewInvite({
-                          code: inv.code,
-                          groupName: inv.groupName,
-                        })
-                      }
-                      className="text-gray-400 hover:text-wedding-gold transition-colors"
-                      title="Get Link"
-                    >
-                      <LinkIcon size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(inv.code)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
+          {isLoading ? (
+            <div className="p-12 text-center">
+              <div className="animate-pulse">Loading...</div>
+            </div>
+          ) : (
+            <table className="w-full text-left">
+              <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Group Name</th>
+                  <th className="px-6 py-4 font-medium">Code</th>
+                  <th className="px-6 py-4 font-medium">Guests</th>
+                  <th className="px-6 py-4 font-medium">Access</th>
+                  <th className="px-6 py-4 font-medium">Status</th>
+                  <th className="px-6 py-4 font-medium text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredInvitations.map((inv) => (
+                  <tr
+                    key={inv.code}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-6 py-4 font-medium text-gray-900">
+                      {inv.groupName}
+                    </td>
+                    <td className="px-6 py-4 font-mono-text-sm text-gray-600">
+                      {inv.code}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {inv.guests.length}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${inv.accessLevel === "full" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}
+                      >
+                        {inv.accessLevel === "full"
+                          ? "Full wedding"
+                          : "Ceremony Only"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {inv.guests.some((g) => g.rsvpStatus !== "pending") ? (
+                        <span className="text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
+                          Responded
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 text-xs font-medium bg-gray-100 px-2 py-1 rounded-full">
+                          Pending
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button
+                        onClick={() =>
+                          setNewInvite({
+                            code: inv.code,
+                            groupName: inv.groupName,
+                          })
+                        }
+                        className="text-gray-400 hover:text-wedding-gold transition-colors"
+                        title="Get Link"
+                      >
+                        <LinkIcon size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(inv.code)}
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 

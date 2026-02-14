@@ -1,14 +1,3 @@
-// import {
-//   HONEYMOON_ITEMS,
-//   getUpdatedItems,
-//   saveContribution,
-// } from " ../utils/mockHoneymoon";
-import {
-  HONEYMOON_ITEMS,
-  getUpdatedItems,
-  saveContribution,
-} from "../utils/mockHoneymoon";
-
 import { useEffect, useState } from "react";
 import ContributionModal from "../components/honeymoon/ContributionModal";
 import FundItem from "../components/honeymoon/FundItem";
@@ -16,18 +5,27 @@ import PageTransition from "../components/ui/PageTransition";
 import ScrollReveal from "../components/ui/ScrollReveal";
 import ThankYouModal from "../components/ui/ThankYouModal";
 import { useInvitation } from "../hooks/useInvitation";
+import {
+  addContribution,
+  subscribeToHoneymoonItems,
+} from "../lib/firebaseService";
 
 const HoneymoonFundPage = () => {
   const { invitation } = useInvitation;
-  const [items, setItems] = useState(HONEYMOON_ITEMS);
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [lastContributionAmount, setLastContributionAmount] = useState(0);
 
-  // Load updated items on mount
+  // Subscribe to real-time honeymoon items updates
   useEffect(() => {
-    setItems(getUpdatedItems());
+    const unsubscribe = subscribeToHoneymoonItems((updatedItems) => {
+      setItems(updatedItems);
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
   const handleContributeClick = (item) => {
@@ -38,25 +36,17 @@ const HoneymoonFundPage = () => {
   const handleContributionSubmit = async (amount, message) => {
     if (!selectedItem || !invitation) return;
     // Create contribution record
-    const contribution = {
-      id: Date.now().toString(), // TODO check this
-      itemId: selectedItem.id,
-      guestName: invitation.groupName,
-      amount: amount,
-      message: message,
-      createdAt: new Date().toISOString(),
-    };
+    await addContribution(
+      selectedItem.id,
+      invitation.groupName,
+      amount,
+      message,
+    );
 
-    // Save to local storage (mock backend)
-    saveContribution(contribution);
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Update local state
-    setItems(getUpdatedItems());
     setLastContributionAmount(amount);
-    // Close modal and show thank you
     setShowModal(false);
     setShowThankYou(true);
+    // Items will update automatically via real-time listener
   };
 
   const totalRaised = items.reduce((sum, item) => sum + item.currentAmount, 0);
@@ -64,7 +54,7 @@ const HoneymoonFundPage = () => {
 
   return (
     <PageTransition className="bg-white min-h-screen pt-24 pb-24">
-      <div className="max-2-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <ScrollReveal className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-serif mb-4 text-wedding-black">
             Honeymoon Fund
@@ -83,16 +73,27 @@ const HoneymoonFundPage = () => {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {items.map((item, index) => (
-            <FundItem
-              key={item.id}
-              item={item}
-              index={index}
-              onContribute={handleContributeClick}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="animate-pulse bg-gray-100 h-64 rounded-sm"
+              ></div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {items.map((item, index) => (
+              <FundItem
+                key={item.id}
+                item={item}
+                index={index}
+                onContribute={handleContributeClick}
+              />
+            ))}
+          </div>
+        )}
 
         <ContributionModal
           isOpen={showModal}

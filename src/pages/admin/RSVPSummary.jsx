@@ -1,11 +1,24 @@
 import { Check, Download, HelpCircle, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import Button from "../../components/ui/Button";
-import { MOCK_INVITATIONS } from "../../utils/mockInvitations";
+import { getAllInvitations } from "../../lib/firebaseService";
 
 const RSVPSummary = () => {
+  const [invitations, setInvitations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getAllInvitations();
+      setInvitations(data);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, []);
+
   // Flatten guests
-  const allGuests = MOCK_INVITATIONS.flatMap((inv) =>
+  const allGuests = invitations.flatMap((inv) =>
     inv.guests.map((guest) => ({
       ...guest,
       groupName: inv.groupName,
@@ -59,53 +72,59 @@ const RSVPSummary = () => {
       </div>
 
       <div className="bg-white rounded-sm border border-gray-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
-              <tr>
-                <th className="px-6 py-4 font-medium">Guest Name</th>
-                <th className="px-6 py-4 font-medium">Group</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium">Dietary Notes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {allGuests.map((guest) => (
-                <tr
-                  key={guest.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {guest.name}
-                  </td>
-                  <td className="px-6 py-4 text-gray-600 text-sm">
-                    {guest.groupName}
-                  </td>
-                  <td className="px-6 py-4">
-                    {guest.rsvpStatus === "attending" && (
-                      <span className="flex items-center text-green-600 text-sm font-medium">
-                        <Check size={16} className="mr-1" /> Attending
-                      </span>
-                    )}
-                    {guest.rsvpStatus === "declined" && (
-                      <span className="flex items-center text-red-500 text-sm font-medium">
-                        <X size={16} className="mr-1" /> Declined
-                      </span>
-                    )}
-                    {guest.rsvpStatus === "pending" && (
-                      <span className="flex items-center text-gray-400 text-sm font-medium">
-                        <HelpCircle size={16} className="mr-1" /> Pending
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
-                    {guest.dietaryNotes || "-"}
-                  </td>
+        {isLoading ? (
+          <div className="p-12 text-center">
+            <div className="animate-pulse">Loading...</div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Guest Name</th>
+                  <th className="px-6 py-4 font-medium">Group</th>
+                  <th className="px-6 py-4 font-medium">Status</th>
+                  <th className="px-6 py-4 font-medium">Dietary Notes</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {allGuests.map((guest) => (
+                  <tr
+                    key={guest.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-6 py-4 font-medium text-gray-900">
+                      {guest.name}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600 text-sm">
+                      {guest.groupName}
+                    </td>
+                    <td className="px-6 py-4">
+                      {guest.rsvpStatus === "attending" && (
+                        <span className="flex items-center text-green-600 text-sm font-medium">
+                          <Check size={16} className="mr-1" /> Attending
+                        </span>
+                      )}
+                      {guest.rsvpStatus === "declined" && (
+                        <span className="flex items-center text-red-500 text-sm font-medium">
+                          <X size={16} className="mr-1" /> Declined
+                        </span>
+                      )}
+                      {guest.rsvpStatus === "pending" && (
+                        <span className="flex items-center text-gray-400 text-sm font-medium">
+                          <HelpCircle size={16} className="mr-1" /> Pending
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
+                      {guest.dietaryNotes || "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
