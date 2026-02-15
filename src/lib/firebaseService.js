@@ -99,6 +99,20 @@ export const updateInvitationRSVP = async (code, guestRSVPs) => {
   }
 };
 
+export const updateInvitationPhone = async (code, phoneNumber) => {
+  try {
+    const docRef = doc(db, INVITATIONS_COLLECTION, code);
+    await updateDoc(docRef, {
+      phoneNumber,
+      updatedAt: Timestamp.now(),
+    });
+    return true;
+  } catch (error) {
+    console.error("Error updating phone number:", error);
+    return false;
+  }
+};
+
 export const deleteInvitation = async (code) => {
   try {
     await deleteDoc(doc(db, INVITATIONS_COLLECTION, code));

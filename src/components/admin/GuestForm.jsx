@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { Phone, X } from "lucide-react";
 import { useState } from "react";
 import Button from "../ui/Button";
 
@@ -8,6 +8,7 @@ const GuestForm = ({ isOpen, onClose, onSubmit }) => {
   const [guestCount, setGuestCount] = useState(1);
   const [accessLevel, setAccessLevel] = useState("full");
   const [code, setCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const generateCode = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -25,6 +26,7 @@ const GuestForm = ({ isOpen, onClose, onSubmit }) => {
       groupName,
       accessLevel,
       guestCount,
+      phoneNumber: phoneNumber.replace(/\s/g, "") || undefined,
     });
     onClose();
     // Reset Form
@@ -32,6 +34,7 @@ const GuestForm = ({ isOpen, onClose, onSubmit }) => {
     setGuestCount(1);
     setAccessLevel("full");
     setCode("");
+    setPhoneNumber("");
   };
   return (
     <AnimatePresence>
@@ -91,6 +94,27 @@ const GuestForm = ({ isOpen, onClose, onSubmit }) => {
                   className="w-full p-3 border border-gray-200 rounded-sm focus:outline-none focus:border-wedding-gold"
                   placeholder="e.g. The Smith Family"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  WhatsApp Number
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full pl-10 p-3 border border-gray-200 rounded-sm focus:outline-none focus:border-wedding-gold"
+                    placeholder="e.g. 18685551234"
+                  />
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Include country code, no + or spaces (e.g. 18685551234)
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
